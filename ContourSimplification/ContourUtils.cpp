@@ -76,7 +76,7 @@ namespace contour {
 					cv::Mat inflated;
 					cv::dilate(img, img, kernel);
 
-					cv::imwrite("test.png", img);
+					//cv::imwrite("test.png", img);
 
 					// extract a contour (my custom version)
 					std::vector<cv::Point> new_contour;
