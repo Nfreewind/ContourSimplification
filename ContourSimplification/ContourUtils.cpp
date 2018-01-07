@@ -37,9 +37,6 @@ namespace contour {
 					// create a transformation matrix
 					cv::Mat_<float> M = (cv::Mat_<float>(3, 3) << cos(theta) / resolution, -sin(theta) / resolution, dx / resolution, sin(theta) / resolution, cos(theta) / resolution, dy / resolution, 0, 0, 1);
 
-					// create inverse transformation matrix
-					cv::Mat_<float> invM = M.inv();
-
 					// transform the polygon
 					std::vector<cv::Point> polygon(contour.size());
 					for (int i = 0; i < contour.size(); i++) {
@@ -64,6 +61,12 @@ namespace contour {
 						polygon[i].y -= min_pt.y;
 					}
 
+					// update the transformation matrix
+					M = (cv::Mat_<float>(3, 3) << cos(theta) / resolution, -sin(theta) / resolution, dx / resolution - min_pt.x, sin(theta) / resolution, cos(theta) / resolution, dy / resolution - min_pt.y, 0, 0, 1);
+
+					// create inverse transformation matrix
+					cv::Mat_<float> invM = M.inv();
+					
 					cv::Mat img(max_pt.y - min_pt.y + 1, max_pt.x - min_pt.x + 1, CV_8U, cv::Scalar(0));
 
 					// draw a polygon
@@ -86,7 +89,7 @@ namespace contour {
 					if (new_contour.size() >= 3 && a > 0) {
 						// convert the polygon back to the original coordinates
 						for (int i = 0; i < new_contour.size(); i++) {
-							cv::Mat_<float> p = (cv::Mat_<float>(3, 1) << new_contour[i].x + min_pt.x, new_contour[i].y + min_pt.y, 1);
+							cv::Mat_<float> p = (cv::Mat_<float>(3, 1) << new_contour[i].x, new_contour[i].y, 1);
 							cv::Mat_<float> p2 = invM * p;
 							new_contour[i] = cv::Point(p2(0, 0), p2(1, 0));
 						}
